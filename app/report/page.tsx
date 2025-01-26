@@ -8,6 +8,7 @@ import { Libraries } from '@react-google-maps/api';
 import { createUser, getUserByEmail, createReport, getRecentReports } from '@/utils/db/actions';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast'
+import Image from 'next/image';
 
 const geminiApiKey = process.env.GEMINI_API_KEY;
 const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY;
@@ -164,6 +165,14 @@ export default function ReportPage() {
     
     setIsSubmitting(true);
     try {
+      type Report = {
+        id: number;
+        location: string;
+        wasteType: string;
+        amount: string;
+        createdAt: Date;
+      };
+      
       const report = await createReport(
         user.id,
         newReport.location,
@@ -171,7 +180,8 @@ export default function ReportPage() {
         newReport.amount,
         preview || undefined,
         verificationResult ? JSON.stringify(verificationResult) : undefined
-      ) as any;
+      ) as Report;
+      
       
       const formattedReport = {
         id: report.id,
@@ -249,10 +259,17 @@ export default function ReportPage() {
         </div>
         
         {preview && (
-          <div className="mt-4 mb-8">
-            <img src={preview} alt="Waste preview" className="max-w-full h-auto rounded-xl shadow-md" />
-          </div>
-        )}
+  <div className="mt-4 mb-8">
+    <Image
+      src={preview}
+      alt="Waste preview"
+      className="rounded-xl shadow-md"
+      width={400}
+      height={300}
+      priority
+    />
+  </div>
+)}
         
         <Button 
           type="button" 
